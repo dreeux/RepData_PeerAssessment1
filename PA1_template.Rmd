@@ -6,7 +6,7 @@
 1. Load the data
 
 ```{r}
-file <- read.csv("activity.csv", sep = ",", header = TRUE)
+file <- read.csv("/home/arun/data/assg/RepData_PeerAssessment1/activity.csv", sep = ",", header = TRUE)
 ```
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
@@ -30,7 +30,11 @@ qplot(steps, data = file1, fill = date)
 ```{r}
  file_mean <- aggregate(. ~ date, data=file, FUN=mean, na.rm = TRUE)
 
+file_mean
+
 file_median <- aggregate(. ~ date, data=file, FUN=median, na.rm = TRUE)
+
+file_median
 
 ```
 
@@ -60,6 +64,8 @@ max <- max(interval_Avg1)
 
 max_pos <- which(interval_Avg1 == max)
 
+max_pos
+
 ```
 
 ##Imputing missing values
@@ -67,6 +73,9 @@ max_pos <- which(interval_Avg1 == max)
 1. Calculation of the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
 ```{r}
+
+#Create subsets with NA`s and without NA`s
+
 compl_cases <- subset(file, complete.cases(file) == TRUE)
 
 compl_cases1 <- subset(file, complete.cases(file) == FALSE)
@@ -78,6 +87,7 @@ compl_cases1 <- subset(file, complete.cases(file) == FALSE)
 
 ```{r}
 
+#Replace all NA values by Zero
 #This will replace NA`s by '0':
 
 compl_cases1[is.na(compl_cases1)] <- 0
@@ -107,7 +117,11 @@ b) mean and median total number of steps taken per day.
 ```{r}
 new_mean <- aggregate(. ~ date, data=new_dataset1, FUN=mean, na.rm = TRUE)
 
+new_mean
+
 new_median <- aggregate(. ~ date, data=new_dataset1, FUN=median, na.rm = TRUE)
+
+new_median
 
 ```
 
@@ -163,6 +177,5 @@ with(Use_plot[Use_plot$day == "weekday", ],lines(steps ~ interval, type = "l", c
 legend("topright", lty=c(1,1), col = c("blue", "red"), legend = c("weekend", "weekday"), seg.len=2)
        
 ```
-
 
 
