@@ -5,13 +5,15 @@
 
 1. Load the data
 
-```{r}
+
+```r
 file <- read.csv("activity.csv", sep = ",", header = TRUE)
 ```
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
-```{r}
+
+```r
 file1 <- aggregate(. ~ date, data=file, FUN=sum, na.rm = TRUE)
 ```
 
@@ -19,27 +21,34 @@ file1 <- aggregate(. ~ date, data=file, FUN=sum, na.rm = TRUE)
 
 1.histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 library(ggplot2)
 
 qplot(steps, data = file1, fill = date)
 ```
 
+```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
+
 2.To calculate mean and median  total number of steps taken per day
 
-```{r}
+
+```r
  file_mean <- aggregate(. ~ date, data=file, FUN=mean, na.rm = TRUE)
 
 file_median <- aggregate(. ~ date, data=file, FUN=median, na.rm = TRUE)
-
 ```
 
 ##Average daily activity pattern
 
 1.  Time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r}
 
+```r
 compl_cases <- subset(file, complete.cases(file) == TRUE)
 
 file_split <- split(compl_cases, compl_cases$interval, drop = TRUE)
@@ -52,86 +61,117 @@ plot(interval_Avg1, type="l",
      xlab="Interval" )
 ```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+
 2. 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
 
-```{r}
 
+```r
 max <- max(interval_Avg1)
 
 max_pos <- which(interval_Avg1 == max)
-
 ```
 
 ##Imputing missing values
 
 1. Calculation of the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
-```{r}
+
+```r
 compl_cases <- subset(file, complete.cases(file) == TRUE)
 
 compl_cases1 <- subset(file, complete.cases(file) == FALSE)
-
-
 ```
 
 2. strategy for filling in all of the missing values in the dataset.
 
-```{r}
 
+```r
 #This will replace NA`s by '0':
 
 compl_cases1[is.na(compl_cases1)] <- 0
-
 ```
 
 3.  new dataset that is equal to the original dataset but with the missing data filled in.
 
-```{r}
 
+```r
 new_dataset <- merge(compl_cases, compl_cases1, all = TRUE)
-
 ```
 
 4. a)  histogram of the total number of steps taken each day
 
-```{r}
 
+```r
 new_dataset1 <- aggregate(. ~ date, data = new_dataset, FUN=sum, na.rm = TRUE)
 
 qplot(steps, data = new_dataset1, fill = date)
+```
 
 ```
+## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
+```
+
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png) 
 
 b) mean and median total number of steps taken per day.
 
-```{r}
+
+```r
 new_mean <- aggregate(. ~ date, data=new_dataset1, FUN=mean, na.rm = TRUE)
 
 new_median <- aggregate(. ~ date, data=new_dataset1, FUN=median, na.rm = TRUE)
-
 ```
 
 c) difference in values from the estimates from the first part of the assignment and impact of imputing missing data on the estimates of the total daily number of steps
 
-```{r}
 
+```r
 summary(new_dataset1)
+```
 
+```
+##          date        steps          interval     
+##  2012-10-01: 1   Min.   :    0   Min.   :339120  
+##  2012-10-02: 1   1st Qu.: 6778   1st Qu.:339120  
+##  2012-10-03: 1   Median :10395   Median :339120  
+##  2012-10-04: 1   Mean   : 9354   Mean   :339120  
+##  2012-10-05: 1   3rd Qu.:12811   3rd Qu.:339120  
+##  2012-10-06: 1   Max.   :21194   Max.   :339120  
+##  (Other)   :55
+```
+
+```r
 summary(file1)
+```
 
+```
+##          date        steps          interval     
+##  2012-10-02: 1   Min.   :   41   Min.   :339120  
+##  2012-10-03: 1   1st Qu.: 8841   1st Qu.:339120  
+##  2012-10-04: 1   Median :10765   Median :339120  
+##  2012-10-05: 1   Mean   :10766   Mean   :339120  
+##  2012-10-06: 1   3rd Qu.:13294   3rd Qu.:339120  
+##  2012-10-07: 1   Max.   :21194   Max.   :339120  
+##  (Other)   :47
+```
+
+```r
 par(mfrow = c(1,2))
 
 hist(file1$steps, main="Total Steps per Day", xlab="Steps")
 
 hist(new_dataset1$steps, main="New Total Steps per Day", xlab="Steps")
-
 ```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
 ##differences in activity patterns between weekdays and weekends
 
 1. new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day
 
-```{r}
+
+```r
 new_dataset$day <- weekdays(as.Date(new_dataset$date))
 
 for (i in 1:nrow(new_dataset)) {                                     
@@ -146,8 +186,8 @@ for (i in 1:nrow(new_dataset)) {
 
 2.  panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis)
 
-```{r}
 
+```r
 new_split <- split(new_dataset, new_dataset$interval, drop = TRUE)
 
 Use_plot <- aggregate(new_dataset$steps ~ new_dataset$interval + new_dataset$day, new_dataset, mean)
@@ -161,8 +201,9 @@ with(Use_plot[Use_plot$day == "weekend", ],lines(steps ~ interval, type = "l", c
 with(Use_plot[Use_plot$day == "weekday", ],lines(steps ~ interval, type = "l", col = "red") )
 
 legend("topright", lty=c(1,1), col = c("blue", "red"), legend = c("weekend", "weekday"), seg.len=2)
-       
 ```
+
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
 
 
 
